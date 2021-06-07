@@ -2,4 +2,4 @@
 
 My analyses of Tidy Tuesday datasets. 
 
-Currently (6/7/2021) actively analyzing all the 3 datasets here
+Currently (6/7/2021) actively analyzing all the 2 datasets here
