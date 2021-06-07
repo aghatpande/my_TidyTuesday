@@ -2,7 +2,7 @@
 title: "horror_movie_profits"
 author: "ASG"
 date: "6/3/2021"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -106,6 +106,5 @@ We see that the horror movie profitability distribution stands out from all othe
 
 TBD 
 
-### Need a way to display the graphs on github
 ### Are there any distributors who have a special talent for picking profitable horror flicks? 
 
