@@ -14,7 +14,7 @@ library(tidyverse)
 library(scales)
 library(lubridate)
 ```
-### Data analyzed by DR on 20181023 is below. The original TidyTuesday github page posits the question: scary-movies-are-the-best-investment-in-hollywood---fivethirtyeight
+### The original TidyTuesday github page posits the question: scary-movies-are-the-best-investment-in-hollywood---fivethirtyeight
 
 ### getting the raw data
 ```{r}
