@@ -9,7 +9,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r include=FALSE}
 library(tidyverse)
 library(scales)
 library(lubridate)
@@ -17,7 +17,7 @@ library(lubridate)
 ### The original TidyTuesday github page posits the question: scary-movies-are-the-best-investment-in-hollywood---fivethirtyeight
 
 ### getting the raw data
-```{r}
+```{r include=FALSE}
 movie_profit <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/2e9bd5a67e09b14d01f616b00f7f7e0931515d24/data/2018/2018-10-23/movie_profit.csv") %>% 
 select(-X1) %>% 
   mutate(release_date = mdy(release_date))
@@ -28,7 +28,7 @@ Before we get into distinct genres, we could ask the an obvious question: what w
 ### creating a gross2cost column
 The ratio of worldwide_gross divided by the production budget will give an approximate measure of the profitability of a movie, not necessarily the final profits from it. We also filter out movies that made no money at all (worldwide_gross has to be > 0).
 
-```{r}
+```{r include=FALSE}
 movie_profit<- movie_profit %>%
   filter(worldwide_gross > 0) %>% 
   mutate(gross2cost_ratio = worldwide_gross / production_budget) %>% 

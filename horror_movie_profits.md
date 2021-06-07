@@ -3,72 +3,9 @@ horror\_movie\_profits
 ASG
 6/3/2021
 
-``` r
-library(tidyverse)
-```
-
-    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-
-    ## ✓ ggplot2 3.3.3     ✓ purrr   0.3.4
-    ## ✓ tibble  3.1.2     ✓ dplyr   1.0.6
-    ## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
-    ## ✓ readr   1.4.0     ✓ forcats 0.5.1
-
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
-
-``` r
-library(scales)
-```
-
-    ## 
-    ## Attaching package: 'scales'
-
-    ## The following object is masked from 'package:purrr':
-    ## 
-    ##     discard
-
-    ## The following object is masked from 'package:readr':
-    ## 
-    ##     col_factor
-
-``` r
-library(lubridate)
-```
-
-    ## 
-    ## Attaching package: 'lubridate'
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     date, intersect, setdiff, union
-
 ### The original TidyTuesday github page posits the question: scary-movies-are-the-best-investment-in-hollywood—fivethirtyeight
 
 ### getting the raw data
-
-``` r
-movie_profit <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/2e9bd5a67e09b14d01f616b00f7f7e0931515d24/data/2018/2018-10-23/movie_profit.csv") %>% 
-select(-X1) %>% 
-  mutate(release_date = mdy(release_date))
-```
-
-    ## Warning: Missing column names filled in: 'X1' [1]
-
-    ## 
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## cols(
-    ##   X1 = col_double(),
-    ##   release_date = col_character(),
-    ##   movie = col_character(),
-    ##   production_budget = col_double(),
-    ##   domestic_gross = col_double(),
-    ##   worldwide_gross = col_double(),
-    ##   distributor = col_character(),
-    ##   mpaa_rating = col_character(),
-    ##   genre = col_character()
-    ## )
 
 Before we get into distinct genres, we could ask the an obvious
 question: what were the most profitable Hollywood movies made and what
@@ -80,13 +17,6 @@ The ratio of worldwide\_gross divided by the production budget will give
 an approximate measure of the profitability of a movie, not necessarily
 the final profits from it. We also filter out movies that made no money
 at all (worldwide\_gross has to be &gt; 0).
-
-``` r
-movie_profit<- movie_profit %>%
-  filter(worldwide_gross > 0) %>% 
-  mutate(gross2cost_ratio = worldwide_gross / production_budget) %>% 
-  arrange(desc(gross2cost_ratio))
-```
 
 ### Top 20 all-time profitable movies
 
