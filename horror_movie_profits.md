@@ -182,6 +182,4 @@ all other genres!
 
 TBD
 
-### Need a way to display the graphs on github
-
 ### Are there any distributors who have a special talent for picking profitable horror flicks?
