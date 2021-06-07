@@ -105,5 +105,7 @@ We see that the horror movie profitability distribution stands out from all othe
 
 
 TBD 
+
+### Need a way to display the graphs on github
 ### Are there any distributors who have a special talent for picking profitable horror flicks? 
 
