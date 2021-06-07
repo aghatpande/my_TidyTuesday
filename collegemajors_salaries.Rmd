@@ -1,0 +1,228 @@
+---
+title: "collegemajors_salaries"
+author: "ASG"
+date: "5/26/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(scales)
+```
+
+```{r}
+recentGrads <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-10-16/recent-grads.csv")
+```
+
+### Some common data processing for next few queries
+
+```{r}
+majrsProcessed <- recentGrads  %>% 
+  mutate(Major = str_to_title(Major))
+```
+
+### What are the major fields / categories by popularity?
+
+```{r}
+majrsProcessed %>% 
+  count(Major_category, wt = Total, sort = TRUE) %>% 
+  mutate(Major_category = fct_reorder(Major_category, n)) %>% 
+  ggplot(aes(Major_category,n, fill = Major_category)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = "",
+       y = "Total number of graduates") +
+    scale_y_continuous(labels = comma_format()) + theme(legend.position = "none")
+```
+
+### What categories of majors make the most money amongst recent graduates?
+
+```{r}
+majrsProcessed %>% 
+  group_by(Major_category) %>% 
+  summarise(fieldMedian = median(Median)) %>% 
+  mutate(Major_category = fct_reorder(Major_category,fieldMedian)) %>% 
+  ggplot(aes(Major_category, fieldMedian, fill = Major_category)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = "",
+       y = "median starting salary") +
+    scale_y_continuous(labels = dollar_format()) + 
+  theme(legend.position = "none")
+
+```
+```{r}
+majrsProcessed %>% 
+  mutate(Major_category = fct_reorder(Major_category,Median)) %>% 
+  ggplot(aes(Major_category, Median, fill = Major_category)) + 
+  geom_boxplot() + 
+  expand_limits(y = 0) +
+  scale_y_continuous(labels = dollar_format()) + 
+  coord_flip() + 
+  theme(legend.position = "none")
+
+```
+### What are the most popular majors?
+
+```{r}
+majrsProcessed %>%  
+  arrange(desc(Total))%>% 
+  mutate(Major = fct_reorder(Major,Total)) %>% 
+  head(20) %>% 
+  ggplot(aes(Major, Total, color = Major , fill = Major)) +
+  geom_col() +
+  scale_y_continuous(labels = comma_format()) +
+  coord_flip() +
+  theme(legend.position = "none")
+```
+
+### What are the least popular majors?
+
+```{r}
+majrsProcessed %>% 
+   arrange(desc(Total))%>% 
+  mutate(Major = fct_reorder(Major,Total)) %>% 
+  tail(20) %>% 
+  ggplot(aes(Major, Total, color = Major , fill = Major)) +
+  geom_col() +
+  scale_y_continuous(labels = comma_format()) +
+  coord_flip() + 
+  theme(legend.position = "none")
+```
+
+### What are the highest earning majors?
+
+```{r}  
+majrsProcessed %>% 
+  mutate(Major = fct_reorder(Major, Median)) %>% 
+  head(20) %>% 
+ggplot(aes(Major, Median, color = Major_category)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = P25th, ymax = P75th)) +
+  scale_y_continuous(labels = scales::dollar_format()) + 
+  expand_limits(y=0) + 
+  coord_flip()
+```
+
+### What are the lowest earning majors?
+
+```{r}
+majrsProcessed %>% 
+  mutate(Major = fct_reorder(Major, Median)) %>% 
+  tail(20) %>% 
+  ggplot(aes(Major, Median, color = Major_category)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = P25th, ymax = P75th)) +
+  scale_y_continuous(labels = dollar_format()) + 
+  expand_limits(y=0) + 
+  coord_flip()
+```
+
+### Correcting for sample size
+
+```{r}
+majrsProcessed %>% 
+  ggplot(aes(Sample_size,Median)) + 
+           geom_point() +
+           geom_text(aes(label = Major), check_overlap = TRUE, vjust = 1, hjust = 1) + 
+  scale_x_log10()
+```
+
+### What are the top 20 earning majors, with at least a 100 graduates responding?
+
+```{r}  
+majrsProcessed %>% 
+  mutate(Major = fct_reorder(Major, Median)) %>% 
+  filter(Sample_size >= 100) %>% 
+  head(20) %>% 
+ggplot(aes(Major, Median, color = Major_category)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = P25th, ymax = P75th)) +
+  scale_y_continuous(labels = scales::dollar_format()) + 
+  expand_limits(y=0) + 
+  coord_flip() +
+    labs( title = "The highest earning majors", subtitle = "Top 20 earning majors with at least 100 graduates responding; bars are 25th and 75th percentiles", 
+    x = "",
+    y = "median salary of graduates")
+```
+
+### What are the lowest 20 earning majors, with at least a 100 graduates responding?
+
+```{r}  
+majrsProcessed %>% 
+  mutate(Major = fct_reorder(Major, Median)) %>% 
+  filter(Sample_size >= 100) %>% 
+  tail(20) %>% 
+ggplot(aes(Major, Median, color = Major_category)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = P25th, ymax = P75th)) +
+  scale_y_continuous(labels = scales::dollar_format()) + 
+  expand_limits(y=0) + 
+  coord_flip() +
+    labs( title = "The lowest earning majors", subtitle = "Lowest 20 earning majors with at least 100 graduates responding; bars are 25th and 75th percentiles",
+          x = "",
+    y = "median salary of graduates")
+```
+
+### How does gender relate to typical earnings?
+
+```{r}
+majrsProcessed %>% 
+  arrange(desc(Total)) %>% 
+  mutate(Major = fct_reorder(Major, Total)) %>% 
+  head(20) %>% 
+  gather(Gender, Number, Men, Women) %>% 
+  ggplot(aes(Major, Number, fill = Gender)) + 
+  geom_col() +
+  labs(title = "Women / men numbers in top 20 majors by popularity",
+       x = "",
+       y = "Total number of graduates") +
+  scale_y_continuous(labels = comma_format()) +
+  coord_flip() 
+```
+
+```{r byMajrCategory}
+byMajrCategory <- majrsProcessed %>% 
+  filter(!is.na(Total)) %>% 
+  group_by(Major_category) %>% 
+  summarise(Men = sum(Men),
+            Women = sum(Women),
+            Total = sum(Total),
+            medianSalary = sum(Median * Sample_size) / sum(Sample_size)) %>% 
+  mutate(ShareWomen = Women / Total ) %>% 
+  arrange(desc(ShareWomen))
+```
+
+```{r}
+library(ggrepel)
+
+byMajrCategory %>% 
+  ggplot(aes(ShareWomen,medianSalary)) + 
+  geom_point() +
+  geom_smooth(method = "lm") + 
+  geom_text_repel(aes(label = Major_category)) +
+  expand_limits(y = 0)
+```
+
+The above graph suggests a negative correlation between salary and majors women prefer. Is this correlation clearer if we plot majors (instead of major categories) against median salaries?
+
+```{r}
+majrsProcessed %>% 
+  ggplot(aes(ShareWomen, Median, color = Major_category)) +
+  geom_point() +
+  geom_smooth(aes( group =1), method = "lm") +
+  expand_limits(y = 0)
+
+```
+
+The above graph clearly shows a negative correlation between median salary for fresh graduates and majors attracting a larger share of women
+
+More TBD
+
+Most interesting question: how is this decision made? Influencing factors? : biology & behavior project
