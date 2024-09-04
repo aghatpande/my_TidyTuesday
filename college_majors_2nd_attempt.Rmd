@@ -1,0 +1,73 @@
+---
+title: "college_majors_second_attempt"
+author: "ASG"
+date: "7/3/2021"
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(scales)
+library(skimr)
+library(moderndive)
+```
+reading in the data
+```{r}
+recentGrads <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-10-16/recent-grads.csv")
+```
+
+viewing raw data
+```{r}
+glimpse(recentGrads)
+slice_sample(recentGrads,n = 5)
+```
+
+selecting variables and running summary statistics
+```{r}
+grads <- recentGrads |> 
+  select(Major, Major_category, total_with_major = Total, sample_size_FT_year_round = Sample_size, Men, Women, Employed, Unemployed, median_earnings_FT = Median)
+grads |> skim()
+```
+
+From the raw data we see that some data is missing / incomplete and some samples for FT, year round earnings are very small. We try to find what is missing or has small sample sizes
+
+```{r}
+small_n <- grads |> filter(between(sample_size_FT_year_round,0,40)) |> arrange(sample_size_FT_year_round)
+```
+
+The 'food science' major has NA values for 'total_with_major', Men and Women variables.
+About 25% or 44/173 majors have a small sample size (< 40) for median earnings of full time, year round graduates.
+
+As exploratory analysis, we could just group the majors into categories and examine the median of median FT earnings within each major category
+```{r}
+major_categories <- grads |> 
+  group_by(Major_category) |> 
+  summarize(majors_in_category = n(),
+            median_of_median_FT_earnings = median(median_earnings_FT),
+            total_grads_category = sum(total_with_major, na.rm = TRUE),
+            sample_size_FT = sum(sample_size_FT_year_round, na.rm = TRUE),
+            men_in_category = sum(Men, na.rm = TRUE),
+            women_in_category = sum(Women, na.rm = TRUE),
+            fracn_unemployed_in_category =
+            sum(Unemployed, na.rm=TRUE) / sum(Employed, na.rm = TRUE)
+            )
+```
+
+Visualizing the major_categories data
+```{r}
+major_categories |> 
+  mutate(Major_category = fct_reorder(Major_category, median_of_median_FT_earnings)) |> 
+  ggplot(aes(x = Major_category, y = median_of_median_FT_earnings)) + 
+  geom_col(aes(fill = fracn_unemployed_in_category)) + 
+  coord_flip() +
+  labs(x = "",
+       y = "median of median salaries in category") +
+  scale_y_continuous(labels = dollar_format()) + 
+  theme(legend.position = "none")
+```
